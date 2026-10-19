@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catatan Amplop Ibu Rumah Tangga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Catatan Amplop Ibu Rumah Tangga</h1>
+        <p>Atur uang belanja ke amplop dan pantau sisanya.</p>
+    </header>
+
+    <main>
+        <section id="ringkasan">
+            <article>
+                <h3>Saldo</h3>
+                <p id="saldo">Rp0</p>
+            </article>
+            <article class="masuk">
+                <h3>Total pemasukan</h3>
+                <p id="pemasukan">Rp0</p>
+            </article>
+            <article class="keluar">
+                <h3>Total pengeluaran</h3>
+                <p id="pengeluaran">Rp0</p>
+            </article>
+        </section>
+
+        <section id="transaksi">
+            <h2 id="judul-form">Tambah transaksi</h2>
+            <form id="form-transaksi" novalidate>
+                <p>
+                    <label><input type="radio" name="jenis" value="pengeluaran" checked> Pengeluaran</label>
+                    <label><input type="radio" name="jenis" value="pemasukan"> Pemasukan</label>
+                </p>
+
+                <label>Nominal (Rp)
+                    <input type="number" name="nominal" min="1" step="1" placeholder="25000">
+                    <small class="error" id="err-nominal"></small>
+                </label>
+
+                <label>Tanggal
+                    <input type="date" name="tanggal">
+                    <small class="error" id="err-tanggal"></small>
+                </label>
+
+                <label>Kategori
+                    <select name="kategori"></select>
+                    <small class="error" id="err-kategori"></small>
+                </label>
+
+                <label id="label-amplop">Amplop
+                    <select name="amplop"></select>
+                    <small class="error" id="err-amplop"></small>
+                </label>
+
+                <label>Catatan (opsional)
+                    <input type="text" name="catatan" maxlength="60" placeholder="Contoh: Sayur dan ikan">
+                </label>
+
+                <button type="submit" id="tombol-simpan">Simpan transaksi</button>
+                <button type="button" id="tombol-batal" class="outline" hidden>Batal ubah</button>
+                <p id="status" class="status"></p>
+            </form>
+        </section>
+
+        <section id="riwayat">
+            <h2>Riwayat transaksi</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Catatan</th>
+                        <th>Kategori</th>
+                        <th>Amplop</th>
+                        <th class="kanan">Nominal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="isi-tabel"></tbody>
+            </table>
+            <p id="kosong">Belum ada transaksi. Isi form untuk mencatat yang pertama.</p>
+        </section>
+
+        <section id="atur-amplop">
+            <h2>Atur nominal amplop</h2>
+            <form id="form-amplop" novalidate>
+                <ul id="input-amplop"></ul>
+                <small class="error" id="err-amplop-form"></small>
+                <button type="submit">Simpan amplop</button>
+                <p id="status-amplop" class="status"></p>
+            </form>
+        </section>
+
+        <section id="sisa-amplop">
+            <h2>Sisa amplop</h2>
+            <ul id="daftar-amplop" class="kartu"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Catatan Amplop Ibu Rumah Tangga.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
