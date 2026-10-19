@@ -17,13 +17,37 @@ function formatRupiah(angka) {
   return "Rp" + angka.toLocaleString("id-ID");
 }
  
-function tampilPesan(teks) {
-  const status = document.getElementById("status");
-  status.textContent = teks;
-  status.className = "status sukses";
+function tampilPesan(id, teks) {
+  const elemen = document.getElementById(id);
+  elemen.textContent = teks;
+  elemen.className = "status sukses";
 }
  
 let transaksi = muatData("transaksi", []);
+let amplop = muatData("amplop", [
+  { id: 1, nama: "Belanja Dapur", nominal: 0 },
+  { id: 2, nama: "Listrik dan Air", nominal: 0 },
+  { id: 3, nama: "Sekolah Anak", nominal: 0 }
+]);
+ 
+function totalJenis(jenis) {
+  return transaksi
+    .filter((t) => t.jenis === jenis)
+    .reduce((total, t) => total + t.nominal, 0);
+}
+ 
+function renderRingkasan() {
+  const pemasukan = totalJenis("pemasukan");
+  const pengeluaran = totalJenis("pengeluaran");
+  document.getElementById("pemasukan").textContent = formatRupiah(pemasukan);
+  document.getElementById("pengeluaran").textContent = formatRupiah(pengeluaran);
+  document.getElementById("saldo").textContent = formatRupiah(pemasukan - pengeluaran);
+}
+ 
+function namaAmplop(id) {
+  const a = amplop.find((x) => x.id === id);
+  return a ? a.nama : "-";
+}
  
 function isiKategori() {
   const daftar = form.jenis.value === "pengeluaran" ? kategoriPengeluaran : kategoriPemasukan;
@@ -34,10 +58,46 @@ function isiKategori() {
   form.kategori.innerHTML = html;
 }
  
+function isiPilihanAmplop() {
+  let html = '<option value="">Pilih amplop</option>';
+  amplop.forEach(function (a) {
+    html += `<option value="${a.id}">${a.nama}</option>`;
+  });
+  form.amplop.innerHTML = html;
+}
+ 
+function aturLabelAmplop() {
+  document.getElementById("label-amplop").hidden = form.jenis.value !== "pengeluaran";
+}
+ 
+function hapusErrors() {
+  ["nominal", "tanggal", "kategori", "amplop"].forEach(function (nama) {
+    document.getElementById("err-" + nama).textContent = "";
+  });
+}
+ 
 function resetForm() {
   form.reset();
   form.tanggal.value = new Date().toLocaleDateString("sv-SE");
   isiKategori();
+  aturLabelAmplop();
+  hapusErrors();
+}
+ 
+function validasiForm(data) {
+  const errors = { nominal: "", tanggal: "", kategori: "", amplop: "" };
+ 
+  if (!(data.nominal > 0)) errors.nominal = "Nominal harus lebih dari 0.";
+  if (data.tanggal === "") errors.tanggal = "Tanggal wajib diisi.";
+  if (data.kategori === "") errors.kategori = "Pilih salah satu kategori.";
+  if (data.jenis === "pengeluaran" && data.amplopId === null) errors.amplop = "Pilih amplop untuk pengeluaran ini.";
+ 
+  document.getElementById("err-nominal").textContent = errors.nominal;
+  document.getElementById("err-tanggal").textContent = errors.tanggal;
+  document.getElementById("err-kategori").textContent = errors.kategori;
+  document.getElementById("err-amplop").textContent = errors.amplop;
+ 
+  return !(errors.nominal || errors.tanggal || errors.kategori || errors.amplop);
 }
  
 function renderDaftar() {
@@ -49,7 +109,7 @@ function renderDaftar() {
       <td data-label="Tanggal">${t.tanggal}</td>
       <td data-label="Catatan">${t.catatan || "-"}</td>
       <td data-label="Kategori">${t.kategori}</td>
-      <td data-label="Amplop">-</td>
+      <td data-label="Amplop">${masuk ? "-" : namaAmplop(t.amplopId)}</td>
       <td data-label="Nominal" class="${masuk ? "masuk" : "keluar"}">${masuk ? "+" : "−"} ${formatRupiah(t.nominal)}</td>
       <td class="aksi">
         <button class="outline kecil bahaya" onclick="hapusTransaksi(${t.id})">Hapus</button>
@@ -61,12 +121,29 @@ function renderDaftar() {
   document.getElementById("kosong").hidden = transaksi.length > 0;
 }
  
+function renderInputAmplop() {
+  let html = "";
+  amplop.forEach(function (a) {
+    html += `<li>
+      <label>${a.nama} (Rp)
+        <input type="number" min="0" step="1" value="${a.nominal}">
+      </label>
+    </li>`;
+  });
+  document.getElementById("input-amplop").innerHTML = html;
+}
+ 
+function renderSemua() {
+  renderRingkasan();
+  renderDaftar();
+}
+ 
 function hapusTransaksi(id) {
   if (!confirm("Hapus transaksi ini?")) return;
   transaksi = transaksi.filter((t) => t.id !== id);
   simpanData("transaksi", transaksi);
-  tampilPesan("Transaksi dihapus.");
-  renderDaftar();
+  tampilPesan("status", "Transaksi dihapus.");
+  renderSemua();
 }
  
 form.addEventListener("submit", function (event) {
@@ -78,21 +155,53 @@ form.addEventListener("submit", function (event) {
     jenis: form.jenis.value,
     kategori: form.kategori.value,
     nominal: Number(form.nominal.value),
-    catatan: form.catatan.value.trim()
+    catatan: form.catatan.value.trim(),
+    amplopId: null
   };
+  if (data.jenis === "pengeluaran" && form.amplop.value !== "") {
+    data.amplopId = Number(form.amplop.value);
+  }
+ 
+  if (!validasiForm(data)) return;
  
   transaksi.push(data);
   simpanData("transaksi", transaksi);
   resetForm();
-  tampilPesan("Transaksi ditambahkan.");
-  renderDaftar();
+  tampilPesan("status", "Transaksi ditambahkan.");
+  renderSemua();
 });
  
 form.addEventListener("change", function (event) {
-  if (event.target.name === "jenis") isiKategori();
+  if (event.target.name === "jenis") {
+    isiKategori();
+    aturLabelAmplop();
+  }
 });
  
-document.getElementById("label-amplop").hidden = true;
+document.getElementById("form-amplop").addEventListener("submit", function (event) {
+  event.preventDefault();
+ 
+  const inputs = document.querySelectorAll("#input-amplop input");
+  let valid = true;
+  inputs.forEach(function (input) {
+    if (input.value === "" || Number(input.value) < 0) valid = false;
+  });
+ 
+  if (!valid) {
+    document.getElementById("err-amplop-form").textContent = "Nominal amplop harus diisi, minimal 0.";
+    return;
+  }
+  document.getElementById("err-amplop-form").textContent = "";
+ 
+  inputs.forEach(function (input, i) {
+    amplop[i].nominal = Number(input.value);
+  });
+  simpanData("amplop", amplop);
+  tampilPesan("status-amplop", "Nominal amplop disimpan.");
+});
+ 
+isiPilihanAmplop();
+renderInputAmplop();
 resetForm();
-renderDaftar();
+renderSemua();
  

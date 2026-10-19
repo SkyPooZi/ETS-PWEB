@@ -18,12 +18,12 @@ Ibu rumah tangga ini membagi uang belanja bulanan ke beberapa "amplop" (misalnya
 - [x] W1 — Tambah transaksi (tanggal, jenis, kategori, nominal, catatan opsional)
 - [x] W2 — Daftar transaksi dirender dinamis, terbaru di atas, format Rupiah
 - [x] W3 — Hapus transaksi dengan konfirmasi
-- [ ] W4 — Data persisten di localStorage
-- [ ] W5 — Ringkasan (total pemasukan, total pengeluaran, saldo) otomatis diperbarui
-- [ ] W6 — Validasi form (nominal > 0, field wajib terisi, pesan error tampil di halaman)
+- [x] W4 — Data persisten di localStorage
+- [x] W5 — Ringkasan (total pemasukan, total pengeluaran, saldo) otomatis diperbarui
+- [x] W6 — Validasi form (nominal > 0, field wajib terisi, pesan error tampil di halaman)
 ### Fitur khas persona (Ibu rumah tangga)
-- [ ] Atur nominal tiap amplop (minimal 3 pos)
-- [ ] Pengeluaran mengurangi amplop terkait
+- [x] Atur nominal tiap amplop (minimal 3 pos)
+- [x] Pengeluaran mengurangi amplop terkait
 - [ ] Tampilkan sisa tiap amplop
 - [ ] Tandai amplop yang sudah habis
 ### Fitur bonus
