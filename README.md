@@ -15,9 +15,9 @@ Ibu rumah tangga ini membagi uang belanja bulanan ke beberapa "amplop" (misalnya
 ## Daftar fitur
  
 ### Fitur wajib (W1–W6)
-- [ ] W1 — Tambah transaksi (tanggal, jenis, kategori, nominal, catatan opsional)
-- [ ] W2 — Daftar transaksi dirender dinamis, terbaru di atas, format Rupiah
-- [ ] W3 — Hapus transaksi dengan konfirmasi
+- [x] W1 — Tambah transaksi (tanggal, jenis, kategori, nominal, catatan opsional)
+- [x] W2 — Daftar transaksi dirender dinamis, terbaru di atas, format Rupiah
+- [x] W3 — Hapus transaksi dengan konfirmasi
 - [ ] W4 — Data persisten di localStorage
 - [ ] W5 — Ringkasan (total pemasukan, total pengeluaran, saldo) otomatis diperbarui
 - [ ] W6 — Validasi form (nominal > 0, field wajib terisi, pesan error tampil di halaman)
