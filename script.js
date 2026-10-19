@@ -29,10 +29,17 @@ let amplop = muatData("amplop", [
   { id: 2, nama: "Listrik dan Air", nominal: 0 },
   { id: 3, nama: "Sekolah Anak", nominal: 0 }
 ]);
+let idDiubah = null;
  
 function totalJenis(jenis) {
   return transaksi
     .filter((t) => t.jenis === jenis)
+    .reduce((total, t) => total + t.nominal, 0);
+}
+ 
+function hitungTerpakai(amplopId) {
+  return transaksi
+    .filter((t) => t.jenis === "pengeluaran" && t.amplopId === amplopId)
     .reduce((total, t) => total + t.nominal, 0);
 }
  
@@ -77,11 +84,15 @@ function hapusErrors() {
 }
  
 function resetForm() {
+  idDiubah = null;
   form.reset();
   form.tanggal.value = new Date().toLocaleDateString("sv-SE");
   isiKategori();
   aturLabelAmplop();
   hapusErrors();
+  document.getElementById("judul-form").textContent = "Tambah transaksi";
+  document.getElementById("tombol-simpan").textContent = "Simpan transaksi";
+  document.getElementById("tombol-batal").hidden = true;
 }
  
 function validasiForm(data) {
@@ -112,6 +123,7 @@ function renderDaftar() {
       <td data-label="Amplop">${masuk ? "-" : namaAmplop(t.amplopId)}</td>
       <td data-label="Nominal" class="${masuk ? "masuk" : "keluar"}">${masuk ? "+" : "−"} ${formatRupiah(t.nominal)}</td>
       <td class="aksi">
+        <button class="outline kecil" onclick="mulaiUbah(${t.id})">Ubah</button>
         <button class="outline kecil bahaya" onclick="hapusTransaksi(${t.id})">Hapus</button>
       </td>
     </tr>`;
@@ -133,15 +145,55 @@ function renderInputAmplop() {
   document.getElementById("input-amplop").innerHTML = html;
 }
  
+function renderAmplop() {
+  let html = "";
+  amplop.forEach(function (a) {
+    const terpakai = hitungTerpakai(a.id);
+    const sisa = a.nominal - terpakai;
+    const habis = (a.nominal > 0 || terpakai > 0) && sisa <= 0;
+    const warna = habis ? "habis" : "aman";
+ 
+    html += `<li>
+      <h3>${a.nama} ${habis ? '<span class="badge habis">Habis</span>' : ""}</h3>
+      <p class="sisa ${warna}">${sisa < 0 ? "Lebih " + formatRupiah(-sisa) : "Sisa " + formatRupiah(sisa)}</p>
+      <progress class="${warna}" value="${Math.min(terpakai, a.nominal)}" max="${a.nominal || 1}"></progress>
+      <small>Terpakai ${formatRupiah(terpakai)} dari ${formatRupiah(a.nominal)}</small>
+    </li>`;
+  });
+  document.getElementById("daftar-amplop").innerHTML = html;
+}
+ 
 function renderSemua() {
   renderRingkasan();
   renderDaftar();
+  renderAmplop();
+}
+ 
+function mulaiUbah(id) {
+  const t = transaksi.find((x) => x.id === id);
+  idDiubah = id;
+ 
+  form.jenis.value = t.jenis;
+  isiKategori();
+  aturLabelAmplop();
+  form.kategori.value = t.kategori;
+  form.nominal.value = t.nominal;
+  form.tanggal.value = t.tanggal;
+  form.catatan.value = t.catatan;
+  form.amplop.value = t.amplopId === null ? "" : t.amplopId;
+ 
+  hapusErrors();
+  document.getElementById("judul-form").textContent = "Ubah transaksi";
+  document.getElementById("tombol-simpan").textContent = "Simpan perubahan";
+  document.getElementById("tombol-batal").hidden = false;
+  form.nominal.focus();
 }
  
 function hapusTransaksi(id) {
   if (!confirm("Hapus transaksi ini?")) return;
   transaksi = transaksi.filter((t) => t.id !== id);
   simpanData("transaksi", transaksi);
+  if (idDiubah === id) resetForm();
   tampilPesan("status", "Transaksi dihapus.");
   renderSemua();
 }
@@ -164,10 +216,18 @@ form.addEventListener("submit", function (event) {
  
   if (!validasiForm(data)) return;
  
-  transaksi.push(data);
+  let pesan = "Transaksi ditambahkan.";
+  if (idDiubah === null) {
+    transaksi.push(data);
+  } else {
+    data.id = idDiubah;
+    transaksi = transaksi.map((t) => (t.id === idDiubah ? data : t));
+    pesan = "Transaksi diperbarui.";
+  }
+ 
   simpanData("transaksi", transaksi);
   resetForm();
-  tampilPesan("status", "Transaksi ditambahkan.");
+  tampilPesan("status", pesan);
   renderSemua();
 });
  
@@ -176,6 +236,11 @@ form.addEventListener("change", function (event) {
     isiKategori();
     aturLabelAmplop();
   }
+});
+ 
+document.getElementById("tombol-batal").addEventListener("click", function () {
+  resetForm();
+  tampilPesan("status", "");
 });
  
 document.getElementById("form-amplop").addEventListener("submit", function (event) {
@@ -198,6 +263,7 @@ document.getElementById("form-amplop").addEventListener("submit", function (even
   });
   simpanData("amplop", amplop);
   tampilPesan("status-amplop", "Nominal amplop disimpan.");
+  renderAmplop();
 });
  
 isiPilihanAmplop();

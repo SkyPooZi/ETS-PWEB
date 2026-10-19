@@ -24,14 +24,14 @@ Ibu rumah tangga ini membagi uang belanja bulanan ke beberapa "amplop" (misalnya
 ### Fitur khas persona (Ibu rumah tangga)
 - [x] Atur nominal tiap amplop (minimal 3 pos)
 - [x] Pengeluaran mengurangi amplop terkait
-- [ ] Tampilkan sisa tiap amplop
-- [ ] Tandai amplop yang sudah habis
+- [x] Tampilkan sisa tiap amplop
+- [x] Tandai amplop yang sudah habis
 ### Fitur bonus
-- [ ] Edit transaksi yang sudah tersimpan
+- [x] Edit transaksi yang sudah tersimpan
 - [ ] Filter (jenis, kategori, rentang tanggal) dan pencarian catatan
 - [ ] Budget per kategori dengan peringatan
 - [ ] Ekspor dan impor data JSON
-- [ ] Tampilan responsif hingga 360px
+- [x] Tampilan responsif hingga 360px
  
 ## Fitur yang belum selesai
  
